@@ -1,0 +1,349 @@
+# Product Requirements Document (PRD)
+## Example Tool Call - WhatsApp AI Bot
+
+### 1. Product Overview
+
+**Product Name:** Example Tool Call  
+**Version:** 1.0  
+**Target Release:** Q1 2025  
+
+**Product Description:**  
+A WhatsApp bot application built with Go and whatsmeow that integrates with Fonnte.com API for messaging capabilities, OpenAI for intelligent responses, and includes tool calling functionality for image generation. The bot can receive webhooks, process messages, and respond with AI-generated content including images.
+
+### 2. Objectives & Goals
+
+**Primary Objectives:**
+- Create a reliable WhatsApp bot using Go and whatsmeow library
+- Integrate with Fonnte.com API for WhatsApp messaging services
+- Implement OpenAI integration for intelligent conversations
+- Provide image generation capabilities through tool calling
+- Handle incoming webhooks efficiently
+
+**Success Metrics:**
+- Bot responds to 99%+ of incoming messages
+- Average response time < 3 seconds
+- Successful image generation rate > 95%
+- Zero downtime during normal operations
+
+### 3. Technical Requirements
+
+#### 3.1 Core Technology Stack
+- **Language:** Go (Golang) 1.21+
+- **WhatsApp Library:** whatsmeow
+- **HTTP Framework:** Gin or Echo (recommended)
+- **AI Integration:** OpenAI API (GPT-4/GPT-3.5-turbo)
+- **Image Generation:** OpenAI DALL-E or Stable Diffusion API
+- **Database:** PostgreSQL or SQLite for session storage
+- **Configuration:** Viper for config management
+
+#### 3.2 External Integrations
+
+**Fonnte.com API Integration:**
+- Send messages via Fonnte API
+- Handle message delivery status
+- Support multimedia messages (images, documents)
+- Rate limiting compliance
+
+**OpenAI Integration:**
+- Chat completions API
+- Function/tool calling capabilities
+- Token usage tracking
+- Error handling and fallbacks
+
+#### 3.3 Webhook Handling
+- Receive incoming WhatsApp messages
+- Process message types (text, image, document, audio)
+- Validate webhook signatures
+- Queue processing for high volume
+
+### 4. Functional Requirements
+
+#### 4.1 Core Features
+
+**F1: WhatsApp Connection Management**
+- Initialize and maintain WhatsApp connection using whatsmeow
+- Handle QR code generation for authentication
+- Automatic reconnection on connection loss
+- Session persistence
+
+**F2: Message Processing**
+- Receive and parse incoming messages
+- Support text, image, audio, and document messages
+- Message queue for processing order
+- Duplicate message detection
+
+**F3: AI Response Generation**
+- Process user messages with OpenAI
+- Generate contextual responses
+- Maintain conversation history
+- Handle rate limiting and errors
+
+**F4: Tool Calling System**
+- Implement OpenAI function calling
+- Image generation tool integration
+- Extensible tool architecture
+- Tool execution logging
+
+**F5: Fonnte API Integration**
+- Send messages through Fonnte API
+- Handle API responses and errors
+- Support message formatting
+- Media file uploads
+
+#### 4.2 Image Generation Tool
+
+**Requirements:**
+- Accept text prompts for image generation
+- Support style parameters (realistic, cartoon, artistic)
+- Image size options (256x256, 512x512, 1024x1024)
+- Return generated images to users
+- Handle generation failures gracefully
+
+**Tool Function Schema:**
+```json
+{
+  "name": "generate_image",
+  "description": "Generate an image based on text prompt",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "prompt": {
+        "type": "string",
+        "description": "Text description of the image to generate"
+      },
+      "style": {
+        "type": "string",
+        "enum": ["realistic", "cartoon", "artistic"],
+        "description": "Style of the generated image"
+      },
+      "size": {
+        "type": "string",
+        "enum": ["256x256", "512x512", "1024x1024"],
+        "description": "Size of the generated image"
+      }
+    },
+    "required": ["prompt"]
+  }
+}
+```
+
+### 5. Architecture Design
+
+#### 5.1 System Architecture
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   WhatsApp      │    │   Example Tool  │    │   External APIs │
+│   Users         │◄──►│   Call Bot      │◄──►│                 │
+│                 │    │                 │    │ • OpenAI        │
+└─────────────────┘    │ ┌─────────────┐ │    │ • Fonnte.com    │
+                       │ │ whatsmeow   │ │    │ • Image Gen     │
+┌─────────────────┐    │ │ library     │ │    │                 │
+│   Fonnte.com    │◄──►│ └─────────────┘ │    └─────────────────┘
+│   Webhook       │    │                 │
+└─────────────────┘    │ ┌─────────────┐ │
+                       │ │ Tool Call   │ │
+                       │ │ Manager     │ │
+                       │ └─────────────┘ │
+                       └─────────────────┘
+```
+
+#### 5.2 Component Structure
+```
+example-tool-call/
+├── cmd/
+│   └── bot/
+│       └── main.go
+├── internal/
+│   ├── config/
+│   ├── handlers/
+│   ├── services/
+│   │   ├── whatsapp/
+│   │   ├── openai/
+│   │   ├── fonnte/
+│   │   └── tools/
+│   ├── models/
+│   └── utils/
+├── pkg/
+├── configs/
+├── scripts/
+└── docs/
+```
+
+### 6. API Specifications
+
+#### 6.1 Webhook Endpoints
+
+**POST /webhook/fonnte**
+- Receive incoming WhatsApp messages from Fonnte
+- Validate request signature
+- Queue message for processing
+
+**POST /webhook/whatsapp**
+- Direct whatsmeow webhook handler
+- Process connection events
+- Handle message events
+
+#### 6.2 Internal APIs
+
+**GET /health**
+- System health check
+- Connection status
+- API availability
+
+**GET /stats**
+- Message processing statistics
+- Tool usage metrics
+- Performance data
+
+### 7. Configuration Requirements
+
+#### 7.1 Environment Variables
+```env
+# WhatsApp Configuration
+WHATSAPP_SESSION_PATH=./sessions
+WHATSAPP_LOG_LEVEL=INFO
+
+# Fonnte Configuration
+FONNTE_API_KEY=your_fonnte_api_key
+FONNTE_WEBHOOK_URL=https://your-domain.com/webhook/fonnte
+
+# OpenAI Configuration
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_MODEL=gpt-4-turbo-preview
+OPENAI_MAX_TOKENS=1000
+
+# Image Generation
+IMAGE_API_PROVIDER=openai # or stability-ai
+IMAGE_API_KEY=your_image_api_key
+
+# Server Configuration
+SERVER_PORT=8080
+SERVER_HOST=0.0.0.0
+
+# Database
+DATABASE_URL=postgres://user:pass@localhost/botdb
+```
+
+### 8. Security Requirements
+
+#### 8.1 Authentication & Authorization
+- Webhook signature validation
+- API key management
+- Rate limiting per user
+- Input sanitization
+
+#### 8.2 Data Protection
+- Encrypt sensitive configuration
+- Secure session storage
+- Message content privacy
+- Audit logging
+
+### 9. Performance Requirements
+
+#### 9.1 Response Time
+- Message processing: < 2 seconds
+- Image generation: < 30 seconds
+- Webhook response: < 500ms
+
+#### 9.2 Throughput
+- Handle 100+ concurrent users
+- Process 1000+ messages per hour
+- Support burst traffic
+
+#### 9.3 Availability
+- 99.9% uptime target
+- Graceful error handling
+- Automatic recovery mechanisms
+
+### 10. Monitoring & Logging
+
+#### 10.1 Logging Requirements
+- Structured logging (JSON format)
+- Log levels: DEBUG, INFO, WARN, ERROR
+- Request/response logging
+- Tool execution logs
+
+#### 10.2 Metrics
+- Message processing rate
+- API response times
+- Error rates
+- Tool usage statistics
+
+### 11. Deployment Requirements
+
+#### 11.1 Containerization
+- Docker container support
+- Multi-stage build
+- Health check endpoints
+- Environment-based configuration
+
+#### 11.2 Infrastructure
+- Linux-based deployment
+- Minimum 1GB RAM
+- Persistent storage for sessions
+- SSL/TLS termination
+
+### 12. Testing Requirements
+
+#### 12.1 Unit Testing
+- 80%+ code coverage
+- Mock external APIs
+- Test tool calling logic
+- Configuration validation tests
+
+#### 12.2 Integration Testing
+- End-to-end message flow
+- Webhook processing
+- API integration tests
+- Error scenario testing
+
+### 13. Documentation Requirements
+
+#### 13.1 Technical Documentation
+- API documentation
+- Configuration guide
+- Deployment instructions
+- Architecture overview
+
+#### 13.2 User Documentation
+- Bot usage guide
+- Available commands
+- Tool capabilities
+- Troubleshooting guide
+
+### 14. Maintenance & Support
+
+#### 14.1 Updates
+- Regular dependency updates
+- Security patch management
+- Feature enhancement process
+- Backward compatibility
+
+#### 14.2 Backup & Recovery
+- Session data backup
+- Configuration backup
+- Disaster recovery plan
+- Data retention policy
+
+### 15. Success Criteria
+
+#### 15.1 Launch Criteria
+- [ ] Successfully connects to WhatsApp via whatsmeow
+- [ ] Fonnte.com integration working
+- [ ] OpenAI responses functioning
+- [ ] Image generation tool operational
+- [ ] Webhook processing reliable
+- [ ] All tests passing
+- [ ] Documentation complete
+
+#### 15.2 Post-Launch Metrics
+- User engagement rate > 70%
+- Image generation success rate > 95%
+- Average response satisfaction score > 4.0/5.0
+- System uptime > 99.5%
+
+---
+
+**Document Version:** 1.0  
+**Last Updated:** July 31, 2025  
+**Next Review:** August 15, 2025
