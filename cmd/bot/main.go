@@ -50,7 +50,7 @@ func main() {
 
 	// Initialize services
 	fontteService := fonnte.New(cfg.Fonnte.APIKey, logger)
-	openaiService := openai.New(cfg.OpenAI.APIKey, cfg.OpenAI.Model, cfg.OpenAI.MaxTokens, logger)
+	openaiService := openai.New(cfg.OpenAI.APIKey, cfg.OpenAI.BaseURL, cfg.OpenAI.Model, cfg.OpenAI.MaxTokens, logger)
 	
 	// Initialize tool manager
 	toolManager := tools.NewManager(db, logger)

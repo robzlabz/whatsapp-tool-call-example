@@ -45,6 +45,7 @@ type FontteConfig struct {
 
 type OpenAIConfig struct {
 	APIKey    string `mapstructure:"api_key"`
+	BaseURL   string `mapstructure:"base_url"`
 	Model     string `mapstructure:"model"`
 	MaxTokens int    `mapstructure:"max_tokens"`
 }
@@ -124,6 +125,7 @@ func setDefaults() {
 	viper.BindEnv("fonnte.api_key", "FONNTE_API_KEY")
 	viper.BindEnv("fonnte.webhook_url", "FONNTE_WEBHOOK_URL")
 	viper.BindEnv("openai.api_key", "OPENAI_API_KEY")
+	viper.BindEnv("openai.base_url", "OPENAI_BASE_URL")
 	viper.BindEnv("openai.model", "OPENAI_MODEL")
 	viper.BindEnv("openai.max_tokens", "OPENAI_MAX_TOKENS")
 	viper.BindEnv("image.provider", "IMAGE_API_PROVIDER")

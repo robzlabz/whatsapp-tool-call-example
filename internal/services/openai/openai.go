@@ -27,8 +27,16 @@ type ChatMessage struct {
 	Content string `json:"content"`
 }
 
-func New(apiKey, model string, maxTokens int, logger *logrus.Logger) *Service {
-	client := openai.NewClient(apiKey)
+func New(apiKey, baseURL, model string, maxTokens int, logger *logrus.Logger) *Service {
+	config := openai.DefaultConfig(apiKey)
+	
+	// Set custom base URL if provided
+	if baseURL != "" {
+		config.BaseURL = baseURL
+		logger.WithField("base_url", baseURL).Info("Using custom OpenAI-compatible API endpoint")
+	}
+	
+	client := openai.NewClientWithConfig(config)
 	return &Service{
 		client:    client,
 		model:     model,

@@ -5,6 +5,7 @@ A WhatsApp bot application built with Go and whatsmeow that integrates with Fonn
 ## Features
 
 - 🤖 **AI-Powered Responses**: Uses OpenAI GPT models for intelligent conversations
+- 🔄 **OpenAI-Compatible APIs**: Support for alternative AI providers (ai.sumopod.com, OpenRouter, etc.)
 - 🎨 **Image Generation**: Generate images using OpenAI DALL-E through tool calling
 - 📱 **WhatsApp Integration**: Direct WhatsApp connection using whatsmeow library
 - 🔗 **Fonnte.com Support**: Alternative messaging through Fonnte API
@@ -78,6 +79,7 @@ docker run -d \
 | `SERVER_HOST` | Server host address | `0.0.0.0` |
 | `SERVER_PORT` | Server port | `8080` |
 | `OPENAI_API_KEY` | OpenAI API key | Required |
+| `OPENAI_BASE_URL` | Custom OpenAI-compatible API endpoint | Optional |
 | `OPENAI_MODEL` | OpenAI model to use | `gpt-4-turbo-preview` |
 | `OPENAI_MAX_TOKENS` | Maximum tokens per response | `1000` |
 | `FONNTE_API_KEY` | Fonnte.com API key | Required |
@@ -86,6 +88,29 @@ docker run -d \
 | `DATABASE_URL` | Database connection URL | `sqlite://./bot.db` |
 | `WHATSAPP_SESSION_PATH` | WhatsApp session storage path | `./sessions` |
 | `WHATSAPP_LOG_LEVEL` | Logging level | `INFO` |
+
+### OpenAI-Compatible APIs
+
+The bot supports OpenAI-compatible API endpoints, allowing you to use alternative AI providers:
+
+```bash
+# Using ai.sumopod.com
+OPENAI_BASE_URL=https://ai.sumopod.com/v1
+OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+OPENAI_MODEL=gpt-4o-mini
+
+# Using OpenRouter
+OPENAI_BASE_URL=https://openrouter.ai/api/v1
+OPENAI_API_KEY=sk-or-v1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+OPENAI_MODEL=openai/gpt-4-turbo-preview
+
+# Using default OpenAI (leave OPENAI_BASE_URL empty)
+OPENAI_BASE_URL=
+OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+OPENAI_MODEL=gpt-4-turbo-preview
+```
+
+For detailed configuration and supported providers, see [OpenAI-Compatible APIs Documentation](docs/openai-compatible-apis.md).
 
 ## API Endpoints
 
